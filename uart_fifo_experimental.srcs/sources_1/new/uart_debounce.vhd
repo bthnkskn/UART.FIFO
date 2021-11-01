@@ -56,6 +56,7 @@ end behavioral;
 
 library ieee;
 use ieee.std_logic_1164.all;
+
 entity btn_debounce is
 port(btn: in std_logic;
      clk: in std_logic;

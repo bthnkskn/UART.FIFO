@@ -5,7 +5,8 @@ use ieee.numeric_std.all;
 entity uart_fifo_experimental is
 port(clk: in std_logic;
      RsRx: in std_logic;
-     RsTx: out std_logic
+     RsTx: out std_logic;
+     led : out std_logic_vector(15 downto 0)
 );
 
 end uart_fifo_experimental;
@@ -34,7 +35,7 @@ signal fifo_rd_data : std_logic_vector(7 downto 0);--fifo width kadar
 signal s_fifo_empty : std_logic;
 
 component uart_rx_ctrl is
-generic (baud : integer := 9600);
+generic (baud : integer := 115200);
 
 port(clk : in std_logic;
      rx : in std_logic; --cihaz?n rx ine ba?la
@@ -46,7 +47,7 @@ port(clk : in std_logic;
 end component;
 
 component uart_tx_ctrl is
-generic (baud : integer := 9600);
+generic (baud : integer := 115200);
 
 port(send : in std_logic;
      clk : in std_logic;
@@ -83,25 +84,34 @@ when s_idle =>
     fifo_wr_en <= '0';
     fifo_rd_en <= '0';
     state <= s_fifo_rx_wr;
+    led (3) <= '1' ;
+    else
+    state <= s_idle;
     end if;
+    
  
 when s_fifo_rx_wr =>
     if s_fifo_full = '0' then
         fifo_wr_en <= '1';
+        fifo_rd_en <= '0';
         fifo_wr_data <= rx_data;
         state <= s_idle;
     else
     fifo_wr_en <= '0';
+    fifo_rd_en <= '0';
     state <= s_fifo_rd_tx;
+    led (0) <= '1' ;
     end if;
     
 when s_fifo_rd_tx =>
     if s_fifo_empty = '0' then
+        fifo_wr_en <= '0';
         fifo_rd_en <= '1';
         tx_data <= fifo_rd_data;
         tx_send <= '1';
         state <= s_uart_transmit;
     else
+    fifo_wr_en <= '0';
     fifo_rd_en <= '0';
     state <= s_fifo_rx_wr;
     end if;    
@@ -112,10 +122,18 @@ when s_uart_transmit =>
         fifo_rd_en <= '0';
         tx_send <= '0';
         state <= s_fifo_rd_tx;
-    end if;       
+        led (1) <= '1' ;
+    else
+    state <= s_uart_transmit;
+    end if;
+    
+    if s_fifo_empty = '1' then
+        state <= s_idle;
+    end if;     
             
 end case;
 end if;
+
 
 end process;
 

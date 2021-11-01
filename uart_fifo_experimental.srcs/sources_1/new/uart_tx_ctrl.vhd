@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity uart_tx_ctrl is
-generic (baud : integer := 9600);
+generic (baud : integer := 115200);
 
 port(send : in std_logic;
      clk : in std_logic;
@@ -32,7 +32,7 @@ if rising_edge(clk) then
 
 case state is
 when rdy =>
-    if send = '1' then
+    if (send = '1') then
     txData <= '1' & transfer_data & '0';
     state <= load_bit;
     end if;

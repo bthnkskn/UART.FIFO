@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity uart_rx_ctrl is
-generic (baud : integer := 9600);
+generic (baud : integer := 115200);
 
 port(clk : in std_logic;
      rx : in std_logic; --cihaz?n rx ine ba?la
