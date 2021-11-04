@@ -77,6 +77,35 @@ end component;
 
 begin
 
+--ayri processler
+
+rx_write_process :process(rx_ready)is
+begin
+if (rising_edge(clk)) then
+    if (s_fifo_full <= '0') then
+        fifo_wr_data <= rx_data;
+        fifo_wr_en <= '1';
+    else
+        fifo_wr_en <= '0';
+    end if;
+end if;
+end process;
+
+
+read_tx_process :process(tx_ready) is
+begin
+if (rising_edge(clk)) then
+    if (s_fifo_empty <= '0') then
+        fifo_rd_en <= '1';
+        tx_data <= fifo_rd_data;
+        tx_send <= '1';
+    else
+        fifo_rd_en <= '0';
+        tx_send <= '0';
+    end if;
+end if;
+end process;
+
 --process(clk) is
 --begin
 --if (count = baud_timer) then
@@ -87,71 +116,72 @@ begin
 --end if;
 --end process;
 
+--hocanin state diagrami
+--process(clk) is
+--begin
 
-process(clk) is
-begin
+--if(rising_edge(clk)) then
 
-if(rising_edge(clk)) then
-
-case state is
-when s_1 =>
-    fifo_wr_en <= '0';
-    fifo_rd_en <= '0';
-    if rx_ready = '1' then
-        state <= s_2;
-    end if;
+--case state is
+--when s_1 =>
+--    fifo_wr_en <= '0';
+--    fifo_rd_en <= '0';
+--    if rx_ready = '1' then
+--        state <= s_2;
+--    end if;
     
-when s_2 =>
-    fifo_wr_data <= rx_data;
-    fifo_wr_en <= '1';
-    fifo_rd_en <= '0';
-    if s_fifo_full = '1' then
-        fifo_wr_en <= '0';
-        fifo_rd_en <= '0';
-        state <= s_4;
-    else     
-        state <= s_3;
-    end if;
+--when s_2 =>
+--    if s_fifo_full = '1' then
+--        fifo_wr_en <= '0';
+--        fifo_rd_en <= '0';
+--        state <= s_4;
+--    else
+--        fifo_wr_data <= rx_data;
+--        fifo_wr_en <= '1';
+--        fifo_rd_en <= '0';     
+--        state <= s_3;
+--    end if;
     
-when s_3 =>
-    fifo_wr_en <= '0';
-    fifo_rd_en <= '0';
-    if rx_ready = '1' then
-        state <= s_3 ;
-    else
-        state <= s_1;
-    end if;    
+--when s_3 =>
+--    fifo_wr_en <= '0';
+--    fifo_rd_en <= '0';
+--    if rx_ready = '1' then
+--        state <= s_3 ;
+--    else
+--        state <= s_1;
+--    end if;    
 
-when s_4 =>
-    fifo_wr_en <= '0';
-    fifo_rd_en <= '1';
-    tx_data <= fifo_rd_data;
-    if s_fifo_empty = '1' then
-        state <= s_1;
-    end if;
-    if tx_ready = '1' then
-        state <= s_5;
-    end if;    
+--when s_4 =>
+--    fifo_wr_en <= '0';
+--    fifo_rd_en <= '1';
+--    tx_data <= fifo_rd_data;
+--    tx_send <= '1';
+--    if s_fifo_empty = '1' then
+--        state <= s_1;
+--    end if;
+--    if tx_ready = '1' then
+--        state <= s_5;
+--    end if;    
      
-when s_5 =>
-    fifo_wr_en <= '0';
-    fifo_rd_en <= '0';
-    if tx_ready = '0' then
-        state <= s_6;
-    else
-        state <= s_5;
-    end if;
+--when s_5 =>
+--    fifo_wr_en <= '0';
+--    fifo_rd_en <= '0';
+--    if tx_ready = '0' then
+--        state <= s_6;
+--    else
+--        state <= s_5;
+--    end if;
         
-when s_6 =>
-    if s_fifo_empty = '0' then
-        state <= s_4;
-    end if;
+--when s_6 =>
+--    if s_fifo_empty = '0' then
+--        state <= s_4;
+--    end if;
        
-end case;
-end if;
-end process;
+--end case;
+--end if;
+--end process;
 
-tx_send <= '1' when (state = s_5) else '0';
+--tx_send <= '1' when (state = s_4) else '0';
 
 rx: uart_rx_ctrl
 port map(clk => clk, rx => RsRx, receive_data => rx_data , parity => rx_parity, ready =>rx_ready , error =>rx_error);

@@ -32,7 +32,7 @@ if rising_edge(clk) then
 
 case state is
 when rdy =>
-    if (send = '1') then
+    if (send) then
     txData <= '1' & transfer_data & '0';
     state <= load_bit;
     end if;

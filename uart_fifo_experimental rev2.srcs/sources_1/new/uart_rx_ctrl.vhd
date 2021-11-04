@@ -31,7 +31,7 @@ if rising_edge(clk) then
 
 case state is
 when rdy =>
-    if rx = '0' then
+    if (rx = '0') then
     state <= start;
     bitIndex <= 0;
     end if;
