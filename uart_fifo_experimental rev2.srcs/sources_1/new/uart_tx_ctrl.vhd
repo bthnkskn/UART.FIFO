@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity uart_tx_ctrl is
-generic (baud : integer := 19200);
+generic (baud : integer := 9600);
 
 port(send : in std_logic;
      clk : in std_logic;

@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 entity uart_rx_ctrl is
-generic (baud : integer := 19200);
+generic (baud : integer := 9600);
 
 port(clk : in std_logic;
      rx : in std_logic; --cihaz?n rx ine ba?la
@@ -20,7 +20,7 @@ type state_type is (rdy, start, receive, waiting, check);
 
 signal state: state_type := rdy;
 signal timer : integer :=0;
-signal bitIndex : integer range 0 to 8 := 0;
+signal bitIndex : integer range 0 TO 8 := 0;
 signal rxdata : std_logic_vector(8 downto 0);
 
 begin
@@ -37,19 +37,19 @@ when rdy =>
     end if;
 
 when start =>
-    if timer = baud_timer/2 then
+    if (timer = baud_timer/2) then
     state <=waiting;
     timer <= 0;
     error <= '0';
     ready <= '0';
     else 
-    timer <= timer+1;
+    timer <= timer + 1;
     end if;
     
 when waiting =>
     if(timer = baud_timer) then
     timer <= 0;
-    if (ready = '1') then
+    if (ready) then
     state <= rdy;
     else
     state <= receive;
